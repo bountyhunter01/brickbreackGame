@@ -5,11 +5,11 @@ document.body.prepend(canvas);
 
 const game = {
   grid: 60,
-  ani: "",
+  ani: '',
   bricks: [],
   num: 100,
   gameover: true,
-  bonus: [],
+  bonus: []
 }; //전체화면 크기
 const ball = {
   //공하나의 설정값
@@ -18,8 +18,8 @@ const ball = {
   w: game.grid / 3,
   h: game.grid / 3, //game.grid라고 정확히 명시해야함
   color: "green",
-  dx: 5,
-  dy: 5,
+  dx: 0,
+  dy: 0,
 };
 const player = {
   //벽돌하나의 설정값
@@ -28,7 +28,7 @@ const player = {
 };
 const keys = { ArrowLeft: false, ArrowRight: false };
 
-canvas.setAttribute("width", game.grid * 15);
+canvas.setAttribute("width", game.grid * 15);//화면크기
 canvas.setAttribute("height", game.grid * 10);
 canvas.style.border = "1px solid black";
 canvas.addEventListener("click", (e) => {
@@ -54,19 +54,19 @@ document.addEventListener("keydown", (e) => {
     ball.dx = 5;
     ball.dy = -5;
   }
-});
+})
 document.addEventListener("keyup", (e) => {
   if (e.code in keys) {
     keys[e.code] = false;
   }
-});
+})
 document.addEventListener("mousemove", (e) => {
   //마우스 위치를 상대적으로 변환
   const val = e.clientX - canvas.offsetLeft;
   if (val > player.w && val < canvas.width) {
     player.x = val - player.w;
     if (!game.inplay) {
-      ball.x = val - player.w / 2;
+      ball.x = val - (player.w / 2);
     }
     // console.log(player.x);
   }
@@ -75,19 +75,19 @@ function resetBall() {
   ball.dx = 0;
   ball.dy = 0;
   ball.y = player.y - ball.h;
-  ball.x = player.x + player.w / 2;
+  ball.x = player.x +( player.w / 2);
   game.inplay = false;
 }
 function gameWinner() {
   game.gameover = true;
   game.inplay = false;
-  // console.log("you win");
+  console.log("you win");
   cancelAnimationFrame(game.ani);
 }
 function gameOver() {
   game.gameover = true;
   game.inplay = false;
-  // console.log("game over prees to start again");
+  console.log("game over prees to start again");
   cancelAnimationFrame(game.ani);
 }
 function outputStartGame() {
@@ -103,7 +103,7 @@ function outputStartGame() {
 function startGame() {
   game.inplay = false;
   player.x = game.grid * 7;
-  player.y = canvas.height - game.grid * 2;
+  player.y = canvas.height-game.grid * 2;
   player.w = game.grid * 1.5;
   player.h = game.grid / 4;
   player.lives = 0;
@@ -131,7 +131,8 @@ function startGame() {
   }
 }
   function createBrick(xPos, yPos, width, height) {
-    let ranCol = "#" + Math.random().toString(16).substring(-6); //조금 어렵다
+    let ranCol = '#' + Math.random().toString(16).substr(-6); //조금 어렵다
+  //  substr 이랑 substring이랑은 큰 차이가 있다
     game.bricks.push({
       x: xPos,
       y: yPos,
@@ -142,14 +143,24 @@ function startGame() {
       bonus: Math.floor(Math.random() * 3),
     });
   }
-  // game.ani = requestAnimationFrame(draw);
+// function drawBricks() {
+//   game.bricks.forEach((brick, index) => {
+//     ctx.beginPath();
+//     ctx.fillStyle = brick.c;
+//     ctx.strokeStyle = "white";
+//     ctx.rect(brick.x, brick.y, brick.w, brick.h);
+//     ctx.fill();
+//     ctx.stroke();
+//     ctx.closePath();
+//   });
+// }
 
   function collDetection(obj1, obj2) {
     //공을 벽과 블록에서 튕기도록 만듬
-    const xAxis = obj1.x < obj2.x + obj2.w && obj1.x + obj1.w > obj2.x;
-    const yAxis = obj1.y < obj2.y + obj2.h && obj1.y + obj1.h > obj2.y;
-    return  xAxis && yAxis;
-    
+    const xAxis = (obj1.x < (obj2.x + obj2.w)) && ((obj1.x + obj1.w) > obj2.x);
+    const yAxis = (obj1.y < (obj2.y + obj2.h)) && ((obj1.y + obj1.h) > obj2.y);
+    const val=  xAxis && yAxis;
+    return val;
   }
   function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height); //지우고 호출하는방식으로 이미지가 움직이는 것처럼 만들기에 필수적
@@ -160,7 +171,7 @@ function startGame() {
     drawBall();
     game.bonus.forEach((prize, index) => {
       prize.y += 5;
-      drawBonus(prize);
+      drawBonus(prize);//그냥 보너스 점수 근데 이 보너스점수랑 볼이 부딪히면서 멈춘다
       if (collDetection(prize, player)) {
         player.score += prize.points;
         let temp = game.bonus.splice(index, 1);
@@ -168,7 +179,7 @@ function startGame() {
       if (prize.y > canvas.height) {
         let temp = game.bonus.splice(index, 1);
       }
-    });
+    })
     game.bricks.forEach((brick, index) => {
       ctx.beginPath();
       ctx.fillStyle = brick.c;
@@ -178,7 +189,7 @@ function startGame() {
       ctx.fill();
       ctx.stroke();
       ctx.closePath();
-      if (collDetection(ball, brick)) {
+      if (collDetection(brick, ball)) {
         let rem = game.bricks.splice(index, 1);
         player.score += brick.v;
         console.log(ball.dy);
@@ -196,13 +207,13 @@ function startGame() {
             color: "white",
             alt: "black",
             counter: 10,
-          });
+          })
         }
         if (game.bricks.length == 0) {
           gameWinner();
         }
       }
-    });
+    })
 
     if (collDetection(player, ball)) {
       ball.dy *= -1;
@@ -211,15 +222,16 @@ function startGame() {
       let val3 = Math.ceil(val2 / (player.w / 10));
       ball.dx = val3;
       // console.log(val1, val2, val3);
-    }
+    };
     let output1 = player.lives == 1 ? "Lift Left" : "Lives Left";
     let output = "${output1} : ${player.lives} Score : ${player.score} ";
-    ctx.font = Math.floor(game.grid * 0.7) + "px serif";
-    if (canvas.width < 900) {
+    ctx.font = Math.floor(game.grid * 0.5) + "px serif";
+    if (game.gameover) {
+      output = 'Score Game Over  Click to Start Again'; 
       ctx.font = "20px serif";
     }
     ctx.textAlign = "center";
-    ctx.fillStyle = "wthite";
+    ctx.fillStyle = "white";
     ctx.fillText(output, canvas.width / 2, canvas.height - 20);
     if (!game.gameover) {
       game.ani = requestAnimationFrame(draw); //다음 프레임호출
@@ -303,7 +315,7 @@ function drawBonus(obj) {
   ctx.fillStyle = obj.color;
   ctx.font = "14px serif";
   ctx.textAlign = "center";
-  ctx.fillText(obj.points.toString(), obj.x + obj.w / 2, obj.y + obj.h / 2);
+  ctx.fillText(obj.points, obj.x + obj.w / 2, obj.y + obj.h / 2);
   ctx.closePath();
 }
 function drawPlayer() {
